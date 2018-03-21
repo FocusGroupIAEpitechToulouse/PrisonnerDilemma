@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+
+import pygame
+import time
+from pygame.locals import *
+from Ia import Ia_turn
+
+def	Player_turn(mouse_pos, TrustButton, BetrayButton):
+
+	if TrustButton.collidepoint(mouse_pos):
+		return (1)
+	elif BetrayButton.collidepoint(mouse_pos):
+		return (0)
+	else:
+		return (-1)
+
+def	display_actions(window, PlayerAction, IaAction, TrustImg, BetrayImg):
+
+	window.fill((255, 255, 255))
+	if (PlayerAction == 1):
+		window.blit(pygame.transform.scale(TrustImg, (370, 200)), (290, 350))
+	else:
+		window.blit(pygame.transform.scale(BetrayImg, (200, 210)), (365, 350))
+
+	if (IaAction == 1):
+		window.blit(pygame.transform.scale(TrustImg, (370, 200)), (290, 150))
+	else:
+		window.blit(pygame.transform.scale(BetrayImg, (200, 210)), (365, 150))
+
+def	main():
+
+	pygame.init()
+	pygame.display.set_caption("Théorie des jeux")
+	should_break = 0
+
+	window = pygame.display.set_mode((960, 720))
+	window.fill((255, 255, 255))
+
+	IaImg = pygame.image.load("img/AI.png")
+	BetrayImg = pygame.image.load("img/betray.png")
+	TrustImg = pygame.image.load("img/trust.png")
+	BetrayButton = pygame.Rect(610, 620, 200, 50)
+	TrustButton = pygame.Rect(120, 620, 200, 50)
+		
+	myfont = pygame.font.SysFont("monospace", 40)
+	scorefont = pygame.font.SysFont("Helvetica", 35)
+	TrustLabel = myfont.render("Trust", 1, (0,0,0))
+	BetrayLabel = myfont.render("Betray", 1, (0,0,0))
+
+	PlayerScore = 0
+	IaScore = 0
+
+	IaAction = -1
+	PlayerAction = -1
+
+	ListPlayerActions = []
+	ListIaActions = []
+	Winner = []
+	Nb_play = 0
+
+	while 1:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				should_break = 1
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				mouse_pos = event.pos
+				PlayerAction = Player_turn(mouse_pos, TrustButton, BetrayButton)
+
+		if PlayerAction >= 0:
+			IaAction = Ia_turn(ListPlayerActions, ListIaActions, PlayerScore, IaAction)
+
+			display_actions(window, PlayerAction, IaAction, TrustImg, BetrayImg)
+			if IaAction > PlayerAction:
+				PlayerScore += 5
+				Winner.append(1)
+			elif IaAction < PlayerAction:
+				IaScore += 5
+				Winner.append(2)
+			elif IaAction == PlayerAction and IaAction == 1:
+				PlayerScore += 3
+				IaScore += 3
+
+			ListIaActions.append(IaAction)
+			ListPlayerActions.append(PlayerAction)
+			Nb_play += 1
+
+		if (should_break):
+			break
+
+		window.blit(scorefont.render("PlayerScore: " + str(PlayerScore), 1, (0,0,0)), (20, 20))
+		window.blit(scorefont.render("IA Score: " + str(IaScore), 1, (0,0,0)), (20, 70))
+		window.blit(scorefont.render("Nb turns: " + str(Nb_play), 1, (0,0,0)), (750, 20))	
+		window.blit(pygame.transform.scale(IaImg, (220,150)), (360, 0))
+		pygame.draw.rect(window, (255, 0, 0), BetrayButton)
+		pygame.draw.rect(window, (0, 255, 0), TrustButton)
+		window.blit(TrustLabel, (150, 625))
+		window.blit(BetrayLabel, (630, 625))
+		pygame.display.flip()
+
+		PlayerAction = -1
+		IaAction = -1
+
+	nb_Win = 0
+	for i in range(len(Winner)):
+		if (Winner[i] == 2):
+			nb_Win += 1
+	nb_trust = 0
+	nb_betray = 0
+	for j in range(len(ListIaActions)):
+		if (ListIaActions[j] == 1):
+			nb_trust += 1
+		else:
+			nb_betray += 1
+
+	print("IA Score: " + str(IaScore))
+
+	if len(ListIaActions) > 0:
+		print("IA trust " + str((nb_trust * 100) / len(ListIaActions)) + "%")
+		print("IA betrayed " + str((nb_betray * 100) / len(ListIaActions)) + "%")
+
+	if len(Winner) == 0:
+		print ("IA Winrate: 100%")
+	elif (nb_Win > 0):
+		print ("IA Winrate: " + str((nb_Win * 100) / len(Winner)) + "%")
+	else:
+		print ("IA Winrate: 0%")
+
+main()

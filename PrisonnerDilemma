@@ -67,7 +67,7 @@ def	main():
 				PlayerAction = Player_turn(mouse_pos, TrustButton, BetrayButton)
 
 		if PlayerAction >= 0:
-			IaAction = Ia_turn(ListPlayerActions, ListIaActions, PlayerScore, IaAction)
+			IaAction = Ia_turn(ListPlayerActions, ListIaActions, PlayerScore, IaScore)
 
 			display_actions(window, PlayerAction, IaAction, TrustImg, BetrayImg)
 			if IaAction > PlayerAction:

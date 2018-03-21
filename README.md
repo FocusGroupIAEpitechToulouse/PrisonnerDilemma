@@ -21,4 +21,5 @@ Pour faire son choix l'IA auras à sa disposition :
   - Le score actuel du joueur
   - Le score de l'IA
   
-Le But Finale de l'IA est d'avoir le meilleur pourcentage de Victoire et/ou de Points a la fin du workshop.
+Votre but final est de développer une I.A capable de répondre à un objectif que vous vous êtes fixé (Avoir le plus haut score, avoir le plus haut winrate ... bref)
+Bonne chance :).
